@@ -1,0 +1,20 @@
+#!/usr/bin/env php
+<?php
+/**
+ * Mysql Import.
+ *
+ * PHP version 5
+ *
+ * @category   Script
+ *
+ * @author     Francesco Bianco <bianco@javanile.org>
+ * @license    https://goo.gl/KPZ2qI  MIT License
+ * @copyright  2015-2018 Javanile.org
+ */
+require_once __DIR__.'/../../../autoload.php';
+
+use Javanile\MysqlImport\MysqlImport;
+
+$app = new MysqlImport($_ENV, $argv);
+
+echo $app->run();

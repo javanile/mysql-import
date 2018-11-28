@@ -1,0 +1,19 @@
+version: '2'
+
+services:
+
+  composer:
+    image: composer
+    volumes: ['./:/app']
+    restart: "no"
+
+  phpunit:
+    image: phpunit/phpunit:6.5.3
+    volumes: ['./:/app']
+    links: ['mysql']
+    restart: "no"
+
+  mysql:
+    image: mysql:5.5
+    environment: ['MYSQL_ROOT_PASSWORD=root']
+    restart: "no"
