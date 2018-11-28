@@ -15,16 +15,6 @@ namespace Javanile\MysqlImport;
 class MysqlImport
 {
     /**
-     * @var array
-     */
-    protected $env;
-
-    /**
-     * @var
-     */
-    protected $argv;
-
-    /**
      * @var string
      */
     protected $file;
@@ -77,9 +67,6 @@ class MysqlImport
      */
     public function __construct($env, $argv)
     {
-        $this->env = $env;
-        $this->argv = $argv;
-
         $opts = [
             ['host', 'localhost', 'MYSQL_HOST', '-h'],
             ['database', 'database', 'MYSQL_DATABASE', '-d'],
@@ -90,18 +77,18 @@ class MysqlImport
 
         foreach ($opts as $opt) {
             $value = $opt[1];
-            if (isset($this->env[$opt[2]])) {
-                $value = $this->env[$opt[2]];
+            if (isset($env[$opt[2]])) {
+                $value = $env[$opt[2]];
             }
 
-            if ($opt[3] && $arg = preg_grep('/^'.$opt[3].'[\S]*/', $this->argv)) {
+            if ($opt[3] && $arg = preg_grep('/^'.$opt[3].'[\S]*/', $argv)) {
                 $value = substr(end($arg), strlen($opt[3]));
             }
 
             $this->{$opt[0]} = $value;
         }
 
-        foreach ($this->argv as $arg) {
+        foreach ($argv as $arg) {
             if ($arg[0] == '-') {
                 continue;
             }
