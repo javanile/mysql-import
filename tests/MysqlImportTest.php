@@ -7,11 +7,11 @@ use PHPUnit\Framework\TestCase;
 
 class MysqlImportTest extends TestCase
 {
-    public function testGetApi()
+    public function testImportByDefault()
     {
         $app = new MysqlImport(
-            [ 'REQUEST_METHOD' => 'GET' ],
-            [ 'Host' => 'test.ipqueue.com' ]
+            [ 'MYSQL_ROOT_PASSWORD' => 'root' ],
+            [ __DIR__.'/fixtures/database.sql' ]
         );
 
         $this->assertEquals($app->run(), "");

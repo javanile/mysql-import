@@ -2,16 +2,18 @@ version: '2'
 
 services:
 
-  composer:
-    image: composer
+  php:
+    build: .
     volumes: ['./:/app']
-    restart: "no"
+
+  composer:
+    extends: { service: php }
+    entrypoint: ['composer']
 
   phpunit:
-    image: phpunit/phpunit:6.5.3
-    volumes: ['./:/app']
+    extends: { service: php }
+    entrypoint: ['./vendor/bin/phpunit']
     links: ['mysql']
-    restart: "no"
 
   mysql:
     image: mysql:5.5
