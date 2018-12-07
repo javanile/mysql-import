@@ -10,8 +10,8 @@ class MysqlImportTest extends TestCase
     public function testImportByDefault()
     {
         $app = new MysqlImport(
-            [ 'MYSQL_ROOT_PASSWORD' => 'root' ],
-            [ __DIR__.'/fixtures/database.sql' ]
+            ['MYSQL_ROOT_PASSWORD' => 'root'],
+            [__DIR__.'/fixtures/database.sql']
         );
 
         $this->assertEquals($app->run(), 'mysql-import: database successfully imported.');

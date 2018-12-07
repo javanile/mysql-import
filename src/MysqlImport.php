@@ -1,11 +1,11 @@
 <?php
 /**
- * foreground-check.php
+ * foreground-check.php.
  *
  * Check database before start container
  *
  * @category   CategoryName
- * @package    PackageName
+ *
  * @author     Francesco Bianco
  * @copyright  2018 Javanile.org
  */
@@ -121,19 +121,20 @@ class MysqlImport
 
         // second attempt real check
         if (!$this->connect('root', $this->rootPassword)) {
-            return $this->message(':' . mysqli_connect_error());
+            return $this->message(':'.mysqli_connect_error());
         }
 
         if ($this->exists()) {
             if ($this->blank()) {
                 return $this->import();
             }
+
             return $this->message('not black database');
         } elseif ($this->create()) {
             return $this->import();
         }
 
-        return $this->message('MYSQL_QUERY_ERROR_' . mysqli_errno($this->link));
+        return $this->message('MYSQL_QUERY_ERROR_'.mysqli_errno($this->link));
     }
 
     /**
@@ -176,6 +177,7 @@ class MysqlImport
      *
      * @param $user
      * @param $password
+     *
      * @return mysqli
      */
     protected function connect($user, $password)
@@ -200,7 +202,7 @@ class MysqlImport
      */
     protected function blank()
     {
-        $this->empty = !@mysqli_fetch_assoc(@mysqli_query($this->link, "SHOW TABLES"));
+        $this->empty = !@mysqli_fetch_assoc(@mysqli_query($this->link, 'SHOW TABLES'));
 
         return $this->empty;
     }
@@ -231,7 +233,7 @@ class MysqlImport
             if (substr(trim($line), -1, 1) == ';') {
                 if (!mysqli_query($this->link, $sql)) {
                     return $this->message(mysqli_error($this->link));
-                };
+                }
                 $sql = '';
             }
         }
@@ -241,10 +243,11 @@ class MysqlImport
 
     /**
      * @param $message
+     *
      * @return mixed
      */
     protected function message($message)
     {
-        return 'mysql-import: ' . $message;
+        return 'mysql-import: '.$message;
     }
 }
