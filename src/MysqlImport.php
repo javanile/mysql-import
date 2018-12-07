@@ -68,7 +68,7 @@ class MysqlImport
     public function __construct($env, $argv)
     {
         $opts = [
-            ['host', 'localhost', 'MYSQL_HOST', '-h'],
+            ['host', 'mysql', 'MYSQL_HOST', '-h'],
             ['database', 'database', 'MYSQL_DATABASE', '-d'],
             ['user', null, 'MYSQL_USER', '-u'],
             ['password', null, 'MYSQL_PASSWORD', '-p'],
@@ -121,7 +121,7 @@ class MysqlImport
 
         // second attempt real check
         if (!$this->connect('root', $this->rootPassword)) {
-            return $this->message('MYSQL_ROOT_CONNECT_' . mysqli_connect_errno());
+            return $this->message(':' . mysqli_connect_error());
         }
 
         if ($this->exists()) {
@@ -180,7 +180,7 @@ class MysqlImport
      */
     protected function connect($user, $password)
     {
-        $this->link = @mysqli_connect($this->host, $user, $password);
+        $this->link = mysqli_connect($this->host, $user, $password);
 
         return $this->link;
     }
@@ -216,10 +216,9 @@ class MysqlImport
     }
 
     /**
-     * @param $link
      * @return bool|mysqli_result
      */
-    function import()
+    public function import()
     {
         mysqli_select_db($this->link, $this->database);
 
@@ -231,13 +230,13 @@ class MysqlImport
             $sql .= $line;
             if (substr(trim($line), -1, 1) == ';') {
                 if (!mysqli_query($this->link, $sql)) {
-                    return false;
+                    return $this->message(mysqli_error($this->link));
                 };
                 $sql = '';
             }
         }
 
-        return true;
+        return $this->message('database successfully imported.');
     }
 
     /**
@@ -246,6 +245,6 @@ class MysqlImport
      */
     protected function message($message)
     {
-        return $message;
+        return 'mysql-import: ' . $message;
     }
 }
