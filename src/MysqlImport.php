@@ -292,7 +292,7 @@ class MysqlImport
     }
 
     /**
-     * Message for not blank database.
+     * Message for connection problem.
      *
      * @param $user
      * @return string
