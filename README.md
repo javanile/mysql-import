@@ -14,3 +14,14 @@ $ composer require javanile/mysql-import
 ```bash
 $ ./vendor/bin/mysql-import database.sql
 ```
+
+
+### Testing
+
+```bash
+$ docker-compose run composer install
+```
+
+```bash
+$ docker-compose run phpunit tests
+```

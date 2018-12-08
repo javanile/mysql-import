@@ -102,39 +102,18 @@ class MysqlImport
     public function run()
     {
         if (!$this->file) {
-            return $this->message('Missing file to import');
+            return $this->message('required sql file to import.');
+        }
+
+        if (!file_exists($this->file)) {
+            return $this->message("sql file '{$this->file}' not found.");
         }
 
         if ($message = $this->tryUserAndPassword()) {
             return $message;
         }
 
-        // process root mysql use
-        if (!$this->rootPassword) {
-            return $this->message('MYSQL_ROOT_PASSWORD_MISSING');
-        }
-
-        // first attempt avoid database delay
-        if (!$this->connect('root', $this->rootPassword)) {
-            sleep(5);
-        }
-
-        // second attempt real check
-        if (!$this->connect('root', $this->rootPassword)) {
-            return $this->message(':'.mysqli_connect_error());
-        }
-
-        if ($this->exists()) {
-            if ($this->blank()) {
-                return $this->import();
-            }
-
-            return $this->message('not black database');
-        } elseif ($this->create()) {
-            return $this->import();
-        }
-
-        return $this->message('MYSQL_QUERY_ERROR_'.mysqli_errno($this->link));
+        return $this->tryRootPassword();
     }
 
     /**
@@ -166,10 +145,43 @@ class MysqlImport
 
         //
         if (!$this->blank()) {
-            return $this->message('not blank database');
+            return $this->messageDatabaseNotBlank();
         }
 
         return $this->import();
+    }
+
+    /**
+     * @return bool|mysqli_result|mixed
+     */
+    protected function tryRootPassword()
+    {
+        // process root mysql use
+        if (!$this->rootPassword) {
+            return $this->message('MYSQL_ROOT_PASSWORD_MISSING');
+        }
+
+        // first attempt avoid database delay
+        if (!$this->connect('root', $this->rootPassword)) {
+            sleep(5);
+        }
+
+        // second attempt real check
+        if (!$this->connect('root', $this->rootPassword)) {
+            return $this->message(':'.mysqli_connect_error());
+        }
+
+        if ($this->exists()) {
+            if ($this->blank()) {
+                return $this->import();
+            }
+
+            return $this->messageDatabaseNotBlank();
+        } elseif ($this->create()) {
+            return $this->import();
+        }
+
+        return $this->message('MYSQL_QUERY_ERROR_'.mysqli_errno($this->link));
     }
 
     /**
@@ -182,12 +194,18 @@ class MysqlImport
      */
     protected function connect($user, $password)
     {
-        $this->link = mysqli_connect($this->host, $user, $password);
+        try {
+            $this->link = mysqli_connect($this->host, $user, $password);
+        } catch (\Throwable $e) {
+            file_put_contents('mysql-import.log', $e->getMessage()."\n".$e->getTraceAsString(), FILE_APPEND);
+        }
 
         return $this->link;
     }
 
     /**
+     * Check if database exists.
+     *
      * @return array|null
      */
     protected function exists()
@@ -198,6 +216,8 @@ class MysqlImport
     }
 
     /**
+     * Check if database is blank.
+     *
      * @return bool
      */
     protected function blank()
@@ -208,11 +228,16 @@ class MysqlImport
     }
 
     /**
+     * Create new database.
+     *
      * @return bool|mysqli_result
      */
     protected function create()
     {
-        $create = mysqli_query($this->link, "CREATE DATABASE {$this->database} CHARACTER SET utf8 COLLATE utf8_general_ci");
+        $create = mysqli_query(
+            $this->link,
+            "CREATE DATABASE {$this->database} CHARACTER SET utf8 COLLATE utf8_general_ci"
+        );
 
         return $create;
     }
@@ -238,7 +263,7 @@ class MysqlImport
             }
         }
 
-        return $this->message('database successfully imported.');
+        return $this->message("database named '{$this->database}' successfully imported.");
     }
 
     /**
@@ -248,7 +273,19 @@ class MysqlImport
      */
     protected function message($message)
     {
-        //**
-        return 'mysql-import: '.$message;
+        return '[mysql-import] '.$message;
+    }
+
+    /**
+     * Message for not blank database.
+     *
+     * @return string
+     */
+    protected function messageDatabaseNotBlank()
+    {
+        return $this->message(
+            "required blank database for import '{$this->file}', 
+            database named '{$this->database}' not is blank on '{$this->host}' host."
+        );
     }
 }

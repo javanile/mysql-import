@@ -14,6 +14,6 @@ class MysqlImportTest extends TestCase
             [__DIR__.'/fixtures/database.sql']
         );
 
-        $this->assertEquals($app->run(), 'mysql-import: database successfully imported.');
+        $this->assertEquals($app->run(), "[mysql-import] database named 'database' successfully imported.");
     }
 }
