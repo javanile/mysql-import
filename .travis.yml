@@ -7,8 +7,12 @@ language: php
 php:
   - '7.2'
 
-addons:
+services:
   - mysql
+
+addons:
+  hosts:
+    - mysql
 
 before_install:
   - sudo mysql -u root -e "CREATE DATABASE IF NOT EXISTS \`database\`;"
