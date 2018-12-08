@@ -152,6 +152,8 @@ class MysqlImport
     }
 
     /**
+     * Try to connect and import using root user and password.
+     *
      * @return bool|mysqli_result|mixed
      */
     protected function tryRootPassword()
@@ -168,7 +170,7 @@ class MysqlImport
 
         // second attempt real check
         if (!$this->connect('root', $this->rootPassword)) {
-            return $this->message(':'.mysqli_connect_error());
+            return $this->messageConnectionProblem('root');
         }
 
         if ($this->exists()) {
@@ -286,6 +288,19 @@ class MysqlImport
         return $this->message(
             "required blank database for import '{$this->file}', 
             database named '{$this->database}' not is blank on '{$this->host}' host."
+        );
+    }
+
+    /**
+     * Message for not blank database.
+     *
+     * @param $user
+     * @return string
+     */
+    protected function messageConnectionProblem($user)
+    {
+        return $this->message(
+            "connection problem for user '{$user}' on host '{$this->host}' with error: ".mysqli_connect_error()
         );
     }
 }
