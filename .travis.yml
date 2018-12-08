@@ -16,7 +16,6 @@ before_install:
   - sudo mysql -u root -e "GRANT ALL ON *.* TO 'username'@'localhost'";
   - sudo mysql -u root -e "FLUSH PRIVILEGES;"
   - sudo mysql -u root -e "use mysql; update user set authentication_string=PASSWORD('root') where User='root'; update user set plugin='mysql_native_password';FLUSH PRIVILEGES;"
-  - sudo mysql_upgrade -uroot
   - sudo service mysql restart
   - sudo apt-get update
 
