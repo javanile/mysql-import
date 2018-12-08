@@ -60,6 +60,11 @@ class MysqlImport
     protected $empty;
 
     /**
+     * @var integer
+     */
+    protected $exitCode;
+
+    /**
      * MysqlImport constructor.
      *
      * @param $env
@@ -67,6 +72,8 @@ class MysqlImport
      */
     public function __construct($env, $argv)
     {
+        $this->exitCode = 0;
+
         $opts = [
             ['host', 'mysql', 'MYSQL_HOST', '-h'],
             ['database', 'database', 'MYSQL_DATABASE', '-d'],
@@ -285,6 +292,8 @@ class MysqlImport
      */
     protected function messageDatabaseNotBlank()
     {
+        $this->exitCode = 0;
+
         return $this->message(
             "required blank database for import '{$this->file}', 
             database named '{$this->database}' not is blank on '{$this->host}' host."
@@ -299,6 +308,8 @@ class MysqlImport
      */
     protected function messageConnectionProblem($user)
     {
+        $this->exitCode = 2;
+
         return $this->message(
             "connection problem for user '{$user}' on host '{$this->host}' with error: ".mysqli_connect_error()
         );

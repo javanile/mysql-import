@@ -18,3 +18,5 @@ use Javanile\MysqlImport\MysqlImport;
 $app = new MysqlImport($_ENV, $argv);
 
 echo $app->run() . "\n";
+
+exit($app->getExitCode());
