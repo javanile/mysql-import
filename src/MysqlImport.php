@@ -248,6 +248,7 @@ class MysqlImport
      */
     protected function message($message)
     {
+        //**
         return 'mysql-import: '.$message;
     }
 }
