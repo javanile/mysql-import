@@ -10,6 +10,9 @@
       "email": "bianco@javanile.org"
     }
   ],
+  "bin": [
+    "bin/mysql-import"
+  ],
   "autoload": {
     "psr-4": {
       "Javanile\\MysqlImport\\": "src"
