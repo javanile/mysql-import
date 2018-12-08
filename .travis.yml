@@ -19,7 +19,8 @@ before_install:
   - sudo mysql -u root -e "CREATE USER 'username'@'localhost' IDENTIFIED BY 'password';"
   - sudo mysql -u root -e "GRANT ALL ON *.* TO 'username'@'localhost'";
   - sudo mysql -u root -e "FLUSH PRIVILEGES;"
-  - echo "USE mysql;\nUPDATE user SET password=PASSWORD('root') WHERE user='root';\nFLUSH PRIVILEGES;\n" | mysql -u root  - sudo service mysql restart
+  - sudo mysql -u root -e "USE mysql; UPDATE user SET password=PASSWORD('root') WHERE user='root'; FLUSH PRIVILEGES;"
+  - sudo service mysql restart
   - sudo apt-get update
 
 before_script:
