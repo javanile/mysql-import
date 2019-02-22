@@ -1,6 +1,6 @@
 <?php
 
-namespace Javanile\IpQueue\Tests;
+namespace Javanile\MysqlImport\Tests;
 
 use Javanile\MysqlImport\MysqlImport;
 use PHPUnit\Framework\TestCase;

@@ -102,7 +102,7 @@ class MysqlImport
             $this->{$opt[0]} = $value;
         }
 
-        // Fix rootPassword usign password as default
+        // Set rootPassword usign password as default
         if (is_null($this->rootPassword) && !is_null($this->password)) {
             $this->rootPassword = $this->password;
         }
@@ -160,7 +160,7 @@ class MysqlImport
 
         //
         if (!$this->exists()) {
-            return false;
+            $this->create();
         }
 
         //
@@ -219,7 +219,8 @@ class MysqlImport
         try {
             $this->link = mysqli_connect($this->host, $user, $password, '', $this->port);
         } catch (\Throwable $e) {
-            file_put_contents('mysql-import.log', $e->getMessage()."\n".$e->getTraceAsString(), FILE_APPEND);
+            $log = 'ERROR: '.$e->getMessage()."\n".$e->getTraceAsString()."\n";
+            file_put_contents('mysql-import.log', $log, FILE_APPEND);
         }
 
         return $this->link;
@@ -232,7 +233,7 @@ class MysqlImport
      */
     protected function exists()
     {
-        $this->exists = @mysqli_fetch_assoc(@mysqli_query($this->link, "SHOW DATABASES LIKE '{$this->name}'"));
+        $this->exists = @mysqli_fetch_assoc(@mysqli_query($this->link, "SHOW DATABASES LIKE '{$this->database}'"));
 
         return $this->exists;
     }
@@ -262,9 +263,11 @@ class MysqlImport
             return;
         }
 
-        $create = mysqli_query($this->link, "DROP DATABASE {$this->database}");
+        $sql = "DROP DATABASE `{$this->database}`";
 
-        return $create;
+        $drop = mysqli_query($this->link, $sql);
+
+        return $drop;
     }
 
     /**
@@ -276,7 +279,7 @@ class MysqlImport
     {
         $create = mysqli_query(
             $this->link,
-            "CREATE DATABASE {$this->database} CHARACTER SET utf8 COLLATE utf8_general_ci"
+            "CREATE DATABASE `{$this->database}` CHARACTER SET utf8 COLLATE utf8_general_ci"
         );
 
         return $create;
@@ -288,6 +291,7 @@ class MysqlImport
     public function import()
     {
         mysqli_select_db($this->link, $this->database);
+        mysqli_query($this->link, "USE `{$this->database}`");
 
         $sql = '';
         foreach (file($this->file) as $line) {
