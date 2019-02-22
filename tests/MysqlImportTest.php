@@ -14,9 +14,11 @@ class MysqlImportTest extends TestCase
 
         $app = new MysqlImport(['MYSQL_ROOT_PASSWORD' => 'root'], [$sqlFile]);
         $this->assertEquals($message, $app->run());
+        $app->drop('yes');
 
         $app = new MysqlImport([], ['-proot', $sqlFile]);
         $this->assertEquals($message, $app->run());
+        $app->drop('yes');
     }
 
     public function testImportWithUserAndPassword()
@@ -26,9 +28,11 @@ class MysqlImportTest extends TestCase
 
         $app = new MysqlImport(['MYSQL_USER' => 'root', 'MYSQL_PASSWORD' => 'root'], [$sqlFile]);
         $this->assertEquals($message, $app->run());
+        $app->drop('yes');
 
         $app = new MysqlImport([], ['-uroot', '-proot', $sqlFile]);
         $this->assertEquals($message, $app->run());
+        $app->drop('yes');
     }
 
     public function testDropAndCreateDatabase()
@@ -42,6 +46,7 @@ class MysqlImportTest extends TestCase
         $app->drop('yes');
 
         $this->assertEquals($message, $app->run());
+        $app->drop('yes');
     }
 
     public function testConnectionProblemWrongPassword()
@@ -51,10 +56,8 @@ class MysqlImportTest extends TestCase
             [__DIR__.'/fixtures/database.sql']
         );
 
-        $this->assertStringStartsWith(
-            "[mysql-import] connection problem for user 'root' on host 'mysql' with error: ",
-            $app->run()
-        );
+        $message = "[mysql-import] connection problem for user 'root' on host 'mysql' with error: ";
+        $this->assertStringStartsWith($message, $app->run());
     }
 
     public function testConnectionProblemWrongHost()
@@ -67,10 +70,8 @@ class MysqlImportTest extends TestCase
             [__DIR__.'/fixtures/database.sql']
         );
 
-        $this->assertStringStartsWith(
-            "[mysql-import] connection problem for user 'root' on host 'wrong' with error: ",
-            $app->run()
-        );
+        $message = "[mysql-import] connection problem for user 'root' on host 'wrong' with error: ";
+        $this->assertStringStartsWith($message, $app->run());
     }
 
     public function testMissingSqlFile()

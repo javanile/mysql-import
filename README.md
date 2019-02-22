@@ -19,9 +19,9 @@ $ ./vendor/bin/mysql-import database.sql
 ### Testing
 
 ```bash
-$ docker-compose run composer install
+$ docker-compose run --rm composer install
 ```
 
 ```bash
-$ docker-compose run phpunit tests
+$ docker-compose run --rm phpunit tests
 ```
