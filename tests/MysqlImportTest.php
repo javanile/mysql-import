@@ -61,7 +61,7 @@ class MysqlImportTest extends TestCase
     {
         $app = new MysqlImport(
             [
-                'MYSQL_HOST' => 'wrong',
+                'MYSQL_HOST'          => 'wrong',
                 'MYSQL_ROOT_PASSWORD' => 'wrong',
             ],
             [__DIR__.'/fixtures/database.sql']
@@ -76,7 +76,7 @@ class MysqlImportTest extends TestCase
     public function testMissingSqlFile()
     {
         $app = new MysqlImport(['MYSQL_ROOT_PASSWORD' => 'root'], []);
-        $this->assertEquals("[mysql-import] required sql file to import.", $app->run());
+        $this->assertEquals('[mysql-import] required sql file to import.', $app->run());
 
         $sqlFile = __DIR__.'/fixtures/not_exists.sql';
         $app = new MysqlImport([], ['-proot', $sqlFile]);
