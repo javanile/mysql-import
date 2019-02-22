@@ -1,6 +1,6 @@
 <?php
 /**
- * MysqlImport
+ * MysqlImport.
  *
  * Import database from command-line.
  *
@@ -65,7 +65,7 @@ class MysqlImport
     protected $empty;
 
     /**
-     * @var integer
+     * @var int
      */
     protected $exitCode;
 
@@ -252,6 +252,8 @@ class MysqlImport
     /**
      * Create new database.
      *
+     * @param null|mixed $agree
+     *
      * @return bool|mysqli_result
      */
     public function drop($agree = null)
@@ -333,6 +335,7 @@ class MysqlImport
      * Message for connection problem.
      *
      * @param $user
+     *
      * @return string
      */
     protected function messageConnectionProblem($user)
