@@ -180,7 +180,7 @@ class MysqlImport
     {
         // process root mysql use
         if (!$this->rootPassword) {
-            return $this->message('MYSQL_ROOT_PASSWORD_MISSING');
+            return $this->message('required at least root password.');
         }
 
         // first attempt avoid database delay
@@ -245,7 +245,11 @@ class MysqlImport
      */
     protected function blank()
     {
-        $this->empty = !@mysqli_fetch_assoc(@mysqli_query($this->link, 'SHOW TABLES'));
+        mysqli_select_db($this->link, $this->database);
+
+        $tables = @mysqli_fetch_all(@mysqli_query($this->link, 'SHOW TABLES'));
+
+        $this->empty = count($tables) == 0;
 
         return $this->empty;
     }
@@ -291,7 +295,6 @@ class MysqlImport
     public function import()
     {
         mysqli_select_db($this->link, $this->database);
-        mysqli_query($this->link, "USE `{$this->database}`");
 
         $sql = '';
         foreach (file($this->file) as $line) {
@@ -329,10 +332,7 @@ class MysqlImport
     {
         $this->exitCode = 0;
 
-        return $this->message(
-            "required blank database for import '{$this->file}', 
-            database named '{$this->database}' not is blank on '{$this->host}' host."
-        );
+        return $this->message("required blank database for import.");
     }
 
     /**
