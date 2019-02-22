@@ -1,13 +1,13 @@
 <?php
 /**
- * foreground-check.php.
+ * MysqlImport
  *
- * Check database before start container
+ * Import database from command-line.
  *
- * @category   CategoryName
+ * @category   Command-line
  *
  * @author     Francesco Bianco
- * @copyright  2018 Javanile.org
+ * @copyright  2018 Javanile
  */
 
 namespace Javanile\MysqlImport;
@@ -75,26 +75,34 @@ class MysqlImport
         $this->exitCode = 0;
 
         $opts = [
-            ['host', 'mysql', 'MYSQL_HOST', '-h'],
-            ['database', 'database', 'MYSQL_DATABASE', '-d'],
-            ['user', null, 'MYSQL_USER', '-u'],
-            ['password', null, 'MYSQL_PASSWORD', '-p'],
-            ['rootPassword', null, 'MYSQL_ROOT_PASSWORD', null],
+            ['host', 'mysql', 'MYSQL_HOST', 'DB_HOST', '-h'],
+            ['port', '3306', 'MYSQL_PORT', 'DB_PORT', '-P'],
+            ['database', 'database', 'MYSQL_DATABASE', 'DB_NAME', '-d'],
+            ['user', null, 'MYSQL_USER', 'DB_USER', '-u'],
+            ['password', null, 'MYSQL_PASSWORD', 'DB_PASSWORD', '-p'],
+            ['rootPassword', null, 'MYSQL_ROOT_PASSWORD', 'DB_ROOT_PASSWORD', null],
         ];
 
         foreach ($opts as $opt) {
-            $value = $opt[1];
+            // Get value from environment
             if (isset($env[$opt[2]])) {
                 $value = $env[$opt[2]];
+            } elseif (isset($env[$opt[3]])) {
+                $value = $env[$opt[3]];
+            } else {
+                $value = $opt[1];
             }
 
-            if ($opt[3] && $arg = preg_grep('/^'.$opt[3].'[\S]*/', $argv)) {
-                $value = substr(end($arg), strlen($opt[3]));
+            // Get value from command-line argument
+            if ($opt[4] && $arg = preg_grep('/^'.$opt[4].'[\S]*/', $argv)) {
+                $value = substr(end($arg), strlen($opt[4]));
             }
 
+            // Place value on property
             $this->{$opt[0]} = $value;
         }
 
+        // Look file to import
         foreach ($argv as $arg) {
             if ($arg[0] == '-') {
                 continue;
@@ -104,7 +112,7 @@ class MysqlImport
     }
 
     /**
-     *
+     * Command entrypoint.
      */
     public function run()
     {
@@ -204,7 +212,7 @@ class MysqlImport
     protected function connect($user, $password)
     {
         try {
-            $this->link = mysqli_connect($this->host, $user, $password);
+            $this->link = mysqli_connect($this->host, $user, $password, $this->port);
         } catch (\Throwable $e) {
             file_put_contents('mysql-import.log', $e->getMessage()."\n".$e->getTraceAsString(), FILE_APPEND);
         }
