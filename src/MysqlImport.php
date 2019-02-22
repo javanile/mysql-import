@@ -32,6 +32,11 @@ class MysqlImport
     /**
      * @var string|null
      */
+    protected $port;
+
+    /**
+     * @var string|null
+     */
     protected $database;
 
     /**
@@ -85,13 +90,8 @@ class MysqlImport
 
         foreach ($opts as $opt) {
             // Get value from environment
-            if (isset($env[$opt[2]])) {
-                $value = $env[$opt[2]];
-            } elseif (isset($env[$opt[3]])) {
-                $value = $env[$opt[3]];
-            } else {
-                $value = $opt[1];
-            }
+            $value = isset($env[$opt[2]]) && $env[$opt[2]] ? $env[$opt[2]]
+                : (isset($env[$opt[3]]) && $env[$opt[3]] ? $env[$opt[3]] : $opt[1]);
 
             // Get value from command-line argument
             if ($opt[4] && $arg = preg_grep('/^'.$opt[4].'[\S]*/', $argv)) {
@@ -100,6 +100,11 @@ class MysqlImport
 
             // Place value on property
             $this->{$opt[0]} = $value;
+        }
+
+        // Fix rootPassword usign password as default
+        if (is_null($this->rootPassword) && !is_null($this->password)) {
+            $this->rootPassword = $this->password;
         }
 
         // Look file to import
@@ -212,7 +217,7 @@ class MysqlImport
     protected function connect($user, $password)
     {
         try {
-            $this->link = mysqli_connect($this->host, $user, $password, $this->port);
+            $this->link = mysqli_connect($this->host, $user, $password, '', $this->port);
         } catch (\Throwable $e) {
             file_put_contents('mysql-import.log', $e->getMessage()."\n".$e->getTraceAsString(), FILE_APPEND);
         }
@@ -242,6 +247,22 @@ class MysqlImport
         $this->empty = !@mysqli_fetch_assoc(@mysqli_query($this->link, 'SHOW TABLES'));
 
         return $this->empty;
+    }
+
+    /**
+     * Create new database.
+     *
+     * @return bool|mysqli_result
+     */
+    public function drop($agree = null)
+    {
+        if ($agree != 'yes') {
+            return;
+        }
+
+        $create = mysqli_query($this->link, "DROP DATABASE {$this->database}");
+
+        return $create;
     }
 
     /**
