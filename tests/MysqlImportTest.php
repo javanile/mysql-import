@@ -79,6 +79,14 @@ class MysqlImportTest extends TestCase
 
         $app = new MysqlImport(['MYSQL_HOST' => 'wrong', 'MYSQL_ROOT_PASSWORD' => 'wrong'], [$sqlFile]);
         $this->assertStringStartsWith($message, $app->run());
+
+        $app = new MysqlImport([
+            'MYSQL_HOST' => 'wrong',
+            'MYSQL_USER' => 'root',
+            'MYSQL_PASSWORD' => 'wrong'],
+            [$sqlFile]
+        );
+        $this->assertStringStartsWith($message, $app->run());
     }
 
     public function testMissingSqlFile()
