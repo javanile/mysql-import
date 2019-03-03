@@ -350,4 +350,12 @@ class MysqlImport
             "connection problem for user '{$user}' on host '{$this->host}' with error: ".mysqli_connect_error()
         );
     }
+
+    /**
+     *
+     */
+    public function getExitCode()
+    {
+        return $this->exitCode;
+    }
 }
