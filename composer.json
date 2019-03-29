@@ -11,7 +11,7 @@
     }
   ],
   "bin": [
-    "bin/mysql-import"
+    "mysql-import"
   ],
   "autoload": {
     "psr-4": {
