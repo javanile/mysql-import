@@ -87,6 +87,7 @@ class MysqlImportTest extends TestCase
             [$sqlFile]
         );
         $this->assertStringStartsWith($message, $app->run());
+        $this->assertEquals(2, $app->getExitCode());
     }
 
     public function testMissingSqlFile()
@@ -105,6 +106,19 @@ class MysqlImportTest extends TestCase
 
         $app = new MysqlImport([], [$sqlFile]);
         $this->assertEquals('[mysql-import] required at least root password.', $app->run());
+    }
+
+    public function testHostPortFix()
+    {
+        $sqlFile = __DIR__.'/fixtures/database.sql';
+
+        $app = new MysqlImport(['WORDPRESS_DB_HOST' => 'db:10101'], [$sqlFile]);
+        $this->assertEquals([
+            'state' => 'ready',
+            'host' => 'db',
+            'port' => 10101,
+            'database' => 'database'
+        ], $app->getInfo());
     }
 
     public function testSyntaxError()

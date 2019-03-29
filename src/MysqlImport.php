@@ -65,6 +65,11 @@ class MysqlImport
     protected $empty;
 
     /**
+     * @var string
+     */
+    protected $state;
+
+    /**
      * @var int
      */
     protected $exitCode;
@@ -78,33 +83,44 @@ class MysqlImport
     public function __construct($env, $argv)
     {
         $this->exitCode = 0;
+        $this->state = 'ready';
 
         $opts = [
-            ['host', 'mysql', 'MYSQL_HOST', 'DB_HOST', '-h'],
-            ['port', '3306', 'MYSQL_PORT', 'DB_PORT', '-P'],
-            ['database', 'database', 'MYSQL_DATABASE', 'DB_NAME', '-d'],
-            ['user', null, 'MYSQL_USER', 'DB_USER', '-u'],
-            ['password', null, 'MYSQL_PASSWORD', 'DB_PASSWORD', '-p'],
-            ['rootPassword', null, 'MYSQL_ROOT_PASSWORD', 'DB_ROOT_PASSWORD', null],
+            ['host', 'mysql', '-h', 'MYSQL_HOST', 'DB_HOST', 'WORDPRESS_DB_HOST'],
+            ['port', '3306', '-P', 'MYSQL_PORT', 'DB_PORT'],
+            ['database', 'database', '-d', 'MYSQL_DATABASE', 'DB_NAME', 'WORDPRESS_DB_NAME'],
+            ['user', null, '-u', 'MYSQL_USER', 'DB_USER', 'WORDPRESS_DB_USER'],
+            ['password', null, '-p', 'MYSQL_PASSWORD', 'DB_PASSWORD', 'WORDPRESS_DB_PASSWORD'],
+            ['rootPassword', null, null, 'MYSQL_ROOT_PASSWORD', 'DB_ROOT_PASSWORD'],
         ];
 
         foreach ($opts as $opt) {
+            // Get default value
+            $value = $opt[1];
+
             // Get value from environment
-            $value = isset($env[$opt[2]]) && $env[$opt[2]] ? $env[$opt[2]]
-                : (isset($env[$opt[3]]) && $env[$opt[3]] ? $env[$opt[3]] : $opt[1]);
+            for ($index = 3; $index < count($opt); $index++) {
+                $value = isset($env[$opt[$index]]) && $env[$opt[$index]] ? $env[$opt[$index]] : $value;
+            }
 
             // Get value from command-line argument
-            if ($opt[4] && $arg = preg_grep('/^'.$opt[4].'[\S]*/', $argv)) {
-                $value = substr(end($arg), strlen($opt[4]));
+            if ($opt[2] && $arg = preg_grep('/^'.$opt[2].'[\S]*/', $argv)) {
+                $value = substr(end($arg), strlen($opt[2]));
             }
 
             // Place value on property
             $this->{$opt[0]} = $value;
         }
 
-        // Set rootPassword usign password as default
+        // Set rootPassword using password as default
         if (is_null($this->rootPassword) && !is_null($this->password)) {
             $this->rootPassword = $this->password;
+        }
+
+        // Set fix host port
+        if (preg_match('/:([0-9]+)$/', $this->host, $matches)) {
+            $this->host = substr($this->host, 0 , -1 - strlen($matches[1]));
+            $this->port = $matches[1];
         }
 
         // Look file to import
@@ -193,6 +209,7 @@ class MysqlImport
             return $this->messageConnectionProblem('root');
         }
 
+        // try to import
         if ($this->exists()) {
             if ($this->blank()) {
                 return $this->import();
@@ -203,7 +220,7 @@ class MysqlImport
             return $this->import();
         }
 
-        return $this->message('MYSQL_QUERY_ERROR_'.mysqli_errno($this->link));
+        return $this->message(mysqli_error($this->link));
     }
 
     /**
@@ -352,10 +369,25 @@ class MysqlImport
     }
 
     /**
+     * Get exit code after run.
      *
+     * @return integer
      */
     public function getExitCode()
     {
         return $this->exitCode;
+    }
+
+    /**
+     * Get information.
+     */
+    public function getInfo()
+    {
+        return [
+            'state' => $this->state,
+            'host' => $this->host,
+            'port' => $this->port,
+            'database' => $this->database
+        ];
     }
 }

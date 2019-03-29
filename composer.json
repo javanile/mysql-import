@@ -1,7 +1,7 @@
 {
   "name": "javanile/mysql-import",
   "description": "Import SQL file from command-line",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "license": "MIT",
   "type": "project",
   "authors": [
@@ -22,6 +22,9 @@
     "psr-4": {
       "Javanile\\MysqlImport\\Tests\\": "tests"
     }
+  },
+  "require": {
+    "ext-mysqli": "*"
   },
   "require-dev": {
     "phpunit/phpunit": "^6.5"
