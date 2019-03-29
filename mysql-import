@@ -15,7 +15,7 @@ require_once __DIR__.'/../../autoload.php';
 
 use Javanile\MysqlImport\MysqlImport;
 
-$app = new MysqlImport($_ENV, $argv);
+$app = new MysqlImport($_ENV, array_slice($argv, 1));
 
 echo $app->run() . "\n";
 
