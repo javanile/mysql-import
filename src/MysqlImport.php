@@ -168,7 +168,7 @@ class MysqlImport
 
         // first attempt avoid database delay
         if (!$this->connect($this->user, $this->password)) {
-            sleep(5);
+            sleep(10);
         }
 
         // second attempt real check
@@ -203,7 +203,7 @@ class MysqlImport
 
         // first attempt avoid database delay
         if (!$this->connect('root', $this->rootPassword)) {
-            sleep(5);
+            sleep(10);
         }
 
         // second attempt real check
