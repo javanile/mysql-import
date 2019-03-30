@@ -85,7 +85,7 @@ class MysqlImport
         $this->exitCode = 0;
         $this->state = 'ready';
 
-        $defaultDatabase = isset($argv['WORDPRESS_DB_PASSWORD']) ? 'wordpress' : 'database';
+        $defaultDatabase = isset($env['WORDPRESS_DB_PASSWORD']) ? 'wordpress' : 'database';
 
         $opts = [
             ['host', 'mysql', '-h', 'MYSQL_HOST', 'DB_HOST', 'WORDPRESS_DB_HOST'],

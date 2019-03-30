@@ -125,6 +125,19 @@ class MysqlImportTest extends TestCase
         ], $app->getInfo());
     }
 
+    public function testDefaultDatabaseName()
+    {
+        $sqlFile = __DIR__.'/fixtures/database.sql';
+
+        $app = new MysqlImport(['WORDPRESS_DB_PASSWORD' => 'root'], [$sqlFile]);
+        $this->assertEquals([
+            'state' => 'ready',
+            'host' => 'mysql',
+            'port' => 3306,
+            'database' => 'wordpress'
+        ], $app->getInfo());
+    }
+
     public function testSyntaxError()
     {
         $sqlFile = __DIR__.'/fixtures/syntax_error.sql';
