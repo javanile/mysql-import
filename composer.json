@@ -1,7 +1,7 @@
 {
   "name": "javanile/mysql-import",
   "description": "Import SQL file from command-line",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "license": "MIT",
   "type": "project",
   "authors": [

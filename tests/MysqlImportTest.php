@@ -60,6 +60,10 @@ class MysqlImportTest extends TestCase
 
         $app = new MysqlImport([], ['-proot', $sqlFile]);
         $this->assertEquals($message, $app->run());
+
+        $app = new MysqlImport(['DB_USER' => 'root', 'DB_PASSWORD' => 'root'], [$sqlFile]);
+        $this->assertEquals($message, $app->run());
+
         $app->drop('yes');
     }
 
