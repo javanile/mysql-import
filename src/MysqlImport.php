@@ -121,7 +121,7 @@ class MysqlImport
 
         // Set fix host port
         if (preg_match('/:([0-9]+)$/', $this->host, $matches)) {
-            $this->host = substr($this->host, 0 , -1 - strlen($matches[1]));
+            $this->host = substr($this->host, 0, -1 - strlen($matches[1]));
             $this->port = $matches[1];
         }
 
@@ -351,7 +351,7 @@ class MysqlImport
     {
         $this->exitCode = 0;
 
-        return $this->message("required blank database for import.");
+        return $this->message('required blank database for import.');
     }
 
     /**
@@ -373,7 +373,7 @@ class MysqlImport
     /**
      * Get exit code after run.
      *
-     * @return integer
+     * @return int
      */
     public function getExitCode()
     {
@@ -386,10 +386,10 @@ class MysqlImport
     public function getInfo()
     {
         return [
-            'state' => $this->state,
-            'host' => $this->host,
-            'port' => $this->port,
-            'database' => $this->database
+            'state'    => $this->state,
+            'host'     => $this->host,
+            'port'     => $this->port,
+            'database' => $this->database,
         ];
     }
 }
