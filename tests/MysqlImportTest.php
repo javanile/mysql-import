@@ -53,7 +53,7 @@ class MysqlImportTest extends TestCase
     public function testNotBlankDatabase()
     {
         $sqlFile = __DIR__.'/fixtures/database.sql';
-        $message = "[mysql-import] required blank database for import.";
+        $message = '[mysql-import] required blank database for import.';
 
         $app = new MysqlImport(['MYSQL_ROOT_PASSWORD' => 'secret'], [$sqlFile]);
         $app->run();
@@ -85,9 +85,9 @@ class MysqlImportTest extends TestCase
         $this->assertStringStartsWith($message, $app->run());
 
         $app = new MysqlImport([
-            'MYSQL_HOST' => 'wrong',
-            'MYSQL_USER' => 'root',
-            'MYSQL_PASSWORD' => 'wrong'],
+            'MYSQL_HOST'     => 'wrong',
+            'MYSQL_USER'     => 'root',
+            'MYSQL_PASSWORD' => 'wrong', ],
             [$sqlFile]
         );
         $this->assertStringStartsWith($message, $app->run());
@@ -118,10 +118,10 @@ class MysqlImportTest extends TestCase
 
         $app = new MysqlImport(['WORDPRESS_DB_HOST' => 'db:10101'], [$sqlFile]);
         $this->assertEquals([
-            'state' => 'ready',
-            'host' => 'db',
-            'port' => 10101,
-            'database' => 'database'
+            'state'    => 'ready',
+            'host'     => 'db',
+            'port'     => 10101,
+            'database' => 'database',
         ], $app->getInfo());
     }
 
@@ -131,17 +131,17 @@ class MysqlImportTest extends TestCase
 
         $app = new MysqlImport(['WORDPRESS_DB_PASSWORD' => 'secret'], [$sqlFile]);
         $this->assertEquals([
-            'state' => 'ready',
-            'host' => 'mysql',
-            'port' => 3306,
-            'database' => 'wordpress'
+            'state'    => 'ready',
+            'host'     => 'mysql',
+            'port'     => 3306,
+            'database' => 'wordpress',
         ], $app->getInfo());
     }
 
     public function testSyntaxError()
     {
         $sqlFile = __DIR__.'/fixtures/syntax_error.sql';
-        $message = "[mysql-import] You have an error in your SQL syntax; check the manual that corresponds to";
+        $message = '[mysql-import] You have an error in your SQL syntax; check the manual that corresponds to';
 
         $app = new MysqlImport(['MYSQL_ROOT_PASSWORD' => 'secret'], [$sqlFile]);
         $this->assertStringStartsWith($message, $app->run());
