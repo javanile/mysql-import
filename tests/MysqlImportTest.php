@@ -16,7 +16,7 @@ class MysqlImportTest extends TestCase
         $this->assertEquals($message, $app->run());
         $app->drop('yes');
 
-        $app = new MysqlImport([], ['-proot', $sqlFile]);
+        $app = new MysqlImport([], ['-psecret', $sqlFile]);
         $this->assertEquals($message, $app->run());
         $app->drop('yes');
     }
@@ -30,7 +30,7 @@ class MysqlImportTest extends TestCase
         $this->assertEquals($message, $app->run());
         $app->drop('yes');
 
-        $app = new MysqlImport([], ['-uroot', '-proot', $sqlFile]);
+        $app = new MysqlImport([], ['-uroot', '-psecret', $sqlFile]);
         $this->assertEquals($message, $app->run());
         $app->drop('yes');
     }
@@ -58,7 +58,7 @@ class MysqlImportTest extends TestCase
         $app = new MysqlImport(['MYSQL_ROOT_PASSWORD' => 'secret'], [$sqlFile]);
         $app->run();
 
-        $app = new MysqlImport([], ['-proot', $sqlFile]);
+        $app = new MysqlImport([], ['-psecret', $sqlFile]);
         $this->assertEquals($message, $app->run());
 
         $app = new MysqlImport(['DB_USER' => 'root', 'DB_PASSWORD' => 'secret'], [$sqlFile]);
@@ -100,7 +100,7 @@ class MysqlImportTest extends TestCase
         $this->assertEquals('[mysql-import] required sql file to import.', $app->run());
 
         $sqlFile = __DIR__.'/fixtures/not_exists.sql';
-        $app = new MysqlImport([], ['-proot', $sqlFile]);
+        $app = new MysqlImport([], ['-psecret', $sqlFile]);
         $this->assertEquals("[mysql-import] sql file '{$sqlFile}' not found.", $app->run());
     }
 
