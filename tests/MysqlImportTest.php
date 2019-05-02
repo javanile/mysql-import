@@ -12,7 +12,7 @@ class MysqlImportTest extends TestCase
         $sqlFile = __DIR__.'/fixtures/database.sql';
         $message = "[mysql-import] database named 'database' successfully imported.";
 
-        $app = new MysqlImport(['MYSQL_ROOT_PASSWORD' => 'root'], [$sqlFile]);
+        $app = new MysqlImport(['MYSQL_ROOT_PASSWORD' => 'secret'], [$sqlFile]);
         $this->assertEquals($message, $app->run());
         $app->drop('yes');
 
@@ -26,7 +26,7 @@ class MysqlImportTest extends TestCase
         $sqlFile = __DIR__.'/fixtures/database.sql';
         $message = "[mysql-import] database named 'database' successfully imported.";
 
-        $app = new MysqlImport(['MYSQL_USER' => 'root', 'MYSQL_PASSWORD' => 'root'], [$sqlFile]);
+        $app = new MysqlImport(['MYSQL_USER' => 'root', 'MYSQL_PASSWORD' => 'secret'], [$sqlFile]);
         $this->assertEquals($message, $app->run());
         $app->drop('yes');
 
@@ -40,7 +40,7 @@ class MysqlImportTest extends TestCase
         $sqlFile = __DIR__.'/fixtures/database.sql';
         $message = "[mysql-import] database named 'database' successfully imported.";
 
-        $app = new MysqlImport(['MYSQL_USER' => 'root', 'MYSQL_PASSWORD' => 'root'], [$sqlFile]);
+        $app = new MysqlImport(['MYSQL_USER' => 'root', 'MYSQL_PASSWORD' => 'secret'], [$sqlFile]);
 
         $app->run();
         $app->drop();
@@ -55,13 +55,13 @@ class MysqlImportTest extends TestCase
         $sqlFile = __DIR__.'/fixtures/database.sql';
         $message = "[mysql-import] required blank database for import.";
 
-        $app = new MysqlImport(['MYSQL_ROOT_PASSWORD' => 'root'], [$sqlFile]);
+        $app = new MysqlImport(['MYSQL_ROOT_PASSWORD' => 'secret'], [$sqlFile]);
         $app->run();
 
         $app = new MysqlImport([], ['-proot', $sqlFile]);
         $this->assertEquals($message, $app->run());
 
-        $app = new MysqlImport(['DB_USER' => 'root', 'DB_PASSWORD' => 'root'], [$sqlFile]);
+        $app = new MysqlImport(['DB_USER' => 'root', 'DB_PASSWORD' => 'secret'], [$sqlFile]);
         $this->assertEquals($message, $app->run());
 
         $app->drop('yes');
@@ -96,7 +96,7 @@ class MysqlImportTest extends TestCase
 
     public function testMissingSqlFile()
     {
-        $app = new MysqlImport(['MYSQL_ROOT_PASSWORD' => 'root'], []);
+        $app = new MysqlImport(['MYSQL_ROOT_PASSWORD' => 'secret'], []);
         $this->assertEquals('[mysql-import] required sql file to import.', $app->run());
 
         $sqlFile = __DIR__.'/fixtures/not_exists.sql';
@@ -129,7 +129,7 @@ class MysqlImportTest extends TestCase
     {
         $sqlFile = __DIR__.'/fixtures/database.sql';
 
-        $app = new MysqlImport(['WORDPRESS_DB_PASSWORD' => 'root'], [$sqlFile]);
+        $app = new MysqlImport(['WORDPRESS_DB_PASSWORD' => 'secret'], [$sqlFile]);
         $this->assertEquals([
             'state' => 'ready',
             'host' => 'mysql',
@@ -143,7 +143,7 @@ class MysqlImportTest extends TestCase
         $sqlFile = __DIR__.'/fixtures/syntax_error.sql';
         $message = "[mysql-import] You have an error in your SQL syntax; check the manual that corresponds to";
 
-        $app = new MysqlImport(['MYSQL_ROOT_PASSWORD' => 'root'], [$sqlFile]);
+        $app = new MysqlImport(['MYSQL_ROOT_PASSWORD' => 'secret'], [$sqlFile]);
         $this->assertStringStartsWith($message, $app->run());
     }
 }

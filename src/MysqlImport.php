@@ -168,7 +168,10 @@ class MysqlImport
 
         // first attempt avoid database delay
         if (!$this->connect($this->user, $this->password)) {
-            sleep(10);
+            for ($i = 0; $i < 10; $i++) {
+                sleep(1);
+                $this->progressBar($i, 10, "connecting...");
+            }
         }
 
         // second attempt real check
@@ -203,7 +206,11 @@ class MysqlImport
 
         // first attempt avoid database delay
         if (!$this->connect('root', $this->rootPassword)) {
-            sleep(10);
+            for ($i = 0; $i < 10; $i++) {
+                sleep(1);
+                $this->progressBar($i, 10, "connecting...");
+            }
+
         }
 
         // second attempt real check
@@ -236,7 +243,7 @@ class MysqlImport
     protected function connect($user, $password)
     {
         try {
-            $this->link = mysqli_connect($this->host, $user, $password, '', $this->port);
+            $this->link = @mysqli_connect($this->host, $user, $password, '', $this->port);
         } catch (\Throwable $e) {
             $log = 'ERROR: '.$e->getMessage()."\n".$e->getTraceAsString()."\n";
             file_put_contents('mysql-import.log', $log, FILE_APPEND);
@@ -391,5 +398,19 @@ class MysqlImport
             'port' => $this->port,
             'database' => $this->database
         ];
+    }
+
+    /**
+     * @param $done
+     * @param $total
+     * @param string $info
+     * @param int $width
+     * @return string
+     */
+    public function progressBar($done, $total, $info="", $width=10)
+    {
+        $perc = round(($done * 100) / $total);
+        $bar = round(($width * $perc) / 100);
+        echo sprintf("%s%%[%s>%s] %s\r", $perc, str_repeat("=", $bar), str_repeat(" ", $width-$bar), $info);
     }
 }
