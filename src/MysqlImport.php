@@ -7,7 +7,7 @@
  * @category   Command-line
  *
  * @author     Francesco Bianco
- * @copyright  2018 Javanile
+ * @copyright  2015-2019 Javanile
  */
 
 namespace Javanile\MysqlImport;
@@ -65,14 +65,14 @@ class MysqlImport
     protected $empty;
 
     /**
-     * @var string
-     */
-    protected $state;
-
-    /**
      * @var int
      */
     protected $exitCode;
+
+    /**
+     * @var loader
+     */
+    protected $loader;
 
     /**
      * MysqlImport constructor.
@@ -83,7 +83,7 @@ class MysqlImport
     public function __construct($env, $argv)
     {
         $this->exitCode = 0;
-        $this->state = 'ready';
+        $this->loader = '/\______';
 
         $defaultDatabase = isset($env['WORDPRESS_DB_PASSWORD']) ? 'wordpress' : 'database';
 
@@ -168,10 +168,7 @@ class MysqlImport
 
         // first attempt avoid database delay
         if (!$this->connect($this->user, $this->password)) {
-            for ($i = 0; $i < 10; $i++) {
-                sleep(1);
-                $this->progressBar($i, 10, "connecting...");
-            }
+            $this->waiting(10);
         }
 
         // second attempt real check
@@ -206,11 +203,7 @@ class MysqlImport
 
         // first attempt avoid database delay
         if (!$this->connect('root', $this->rootPassword)) {
-            for ($i = 0; $i < 10; $i++) {
-                sleep(1);
-                $this->progressBar($i, 10, "connecting...");
-            }
-
+            $this->waiting(10);
         }
 
         // second attempt real check
@@ -245,8 +238,11 @@ class MysqlImport
         try {
             $this->link = @mysqli_connect($this->host, $user, $password, '', $this->port);
         } catch (\Throwable $e) {
-            $log = 'ERROR: '.$e->getMessage()."\n".$e->getTraceAsString()."\n";
-            file_put_contents('mysql-import.log', $log, FILE_APPEND);
+            file_put_contents(
+                'mysql-import.log',
+                '['.date('Y-m-d H:i:s').'] ERROR - Message: '.$e->getMessage()."\n".$e->getTraceAsString()."\n",
+                FILE_APPEND
+            );
         }
 
         return $this->link;
@@ -346,7 +342,7 @@ class MysqlImport
      */
     protected function message($message)
     {
-        return '[mysql-import] '.$message;
+        return ucfirst($message);
     }
 
     /**
@@ -393,7 +389,6 @@ class MysqlImport
     public function getInfo()
     {
         return [
-            'state'    => $this->state,
             'host'     => $this->host,
             'port'     => $this->port,
             'database' => $this->database,
@@ -407,10 +402,14 @@ class MysqlImport
      * @param int $width
      * @return string
      */
-    public function progressBar($done, $total, $info="", $width=10)
+    public function waiting($second = 10)
     {
-        $perc = round(($done * 100) / $total);
-        $bar = round(($width * $perc) / 100);
-        echo sprintf("%s%%[%s>%s] %s\r", $perc, str_repeat("=", $bar), str_repeat(" ", $width-$bar), $info);
+        $freq = 10;
+        for ($i = 0; $i < $second * $freq; $i++) {
+            echo $text = '['.substr($this->loader, 0, -1).'] waiting... ';
+            usleep(1000000 / $freq);
+            $this->loader = substr($this->loader, -1) . substr($this->loader, 0, -1);
+            echo str_repeat("\010", strlen($text));
+        }
     }
 }

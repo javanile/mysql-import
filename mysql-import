@@ -9,7 +9,7 @@
  *
  * @author     Francesco Bianco <bianco@javanile.org>
  * @license    https://goo.gl/KPZ2qI  MIT License
- * @copyright  2015-2018 Javanile
+ * @copyright  2015-2019 Javanile
  */
 
 if (file_exists(__DIR__ . '/vendor/autoload.php')) {
