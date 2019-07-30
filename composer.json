@@ -3,7 +3,7 @@
   "description": "Import SQL file from command-line",
   "version": "0.0.11",
   "license": "MIT",
-  "type": "project",
+  "type": "library",
   "authors": [
     {
       "name": "Francesco Bianco",
