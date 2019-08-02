@@ -22,7 +22,32 @@ if (file_exists(__DIR__ . '/vendor/autoload.php')) {
 
 use Javanile\MysqlImport\MysqlImport;
 
-$app = new MysqlImport($_ENV, array_slice($argv, 1));
+$env = [];
+
+foreach ([
+    'MYSQL_HOST',
+    'MYSQL_PORT',
+    'MYSQL_DATABASE',
+    'MYSQL_USER',
+    'MYSQL_PASSWORD',
+    'MYSQL_ROOT_PASSWORD',
+    'DB_HOST',
+    'DB_PORT',
+    'DB_NAME',
+    'DB_USER',
+    'DB_PASSWORD',
+    'DB_ROOT_PASSWORD',
+    'WORDPRESS_DB_HOST',
+    'WORDPRESS_DB_NAME',
+    'WORDPRESS_DB_USER',
+    'WORDPRESS_DB_PASSWORD',
+] as $var) {
+    if (getenv($var) !== false) {
+        $env[$var] = getenv($var);
+    }
+}
+
+$app = new MysqlImport($env, array_slice($argv, 1));
 
 echo $app->run() . "\n";
 

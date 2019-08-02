@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-[[ -f mysql-import.log ]] && rm mysql-import.log
+[[ -f mysql-import.log ]] && rm -f mysql-import.log
 
 docker-compose down -v
 docker-compose up -d mysql
