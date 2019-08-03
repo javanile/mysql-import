@@ -70,6 +70,16 @@ class MysqlImport
     protected $exitCode;
 
     /**
+     * @var boolean
+     */
+    protected $doWhile;
+
+    /**
+     * @var boolean
+     */
+    protected $error;
+
+    /**
      * @var loader
      */
     protected $loader;
@@ -84,6 +94,7 @@ class MysqlImport
     {
         $this->exitCode = 0;
         $this->loader = '/\______';
+        $this->doWhile = in_array('--do-while', $argv);
 
         $defaultDatabase = isset($env['WORDPRESS_DB_PASSWORD']) ? 'wordpress' : 'database';
 
@@ -125,6 +136,12 @@ class MysqlImport
             $this->port = $matches[1];
         }
 
+        //
+        if (in_array('--no-file', $argv)) {
+            $this->file = false;
+            return;
+        }
+
         // Look file to import
         foreach ($argv as $arg) {
             if ($arg[0] == '-') {
@@ -139,11 +156,19 @@ class MysqlImport
      */
     public function run()
     {
-        if (!$this->file) {
+        if ($this->doWhile) {
+            $time = time() + 15;
+            do {
+                $this->connect('root', $this->rootPassword);
+                $this->waiting(5);
+            } while ($time > time() && $this->error && $this->error >= 2000);
+        }
+
+        if (!$this->file && $this->file !== false) {
             return $this->message('required sql file to import.');
         }
 
-        if (!file_exists($this->file)) {
+        if (!file_exists($this->file) && $this->file !== false) {
             return $this->message("sql file '{$this->file}' not found.");
         }
 
@@ -236,7 +261,11 @@ class MysqlImport
     protected function connect($user, $password)
     {
         try {
+            $this->error = null;
             $this->link = @mysqli_connect($this->host, $user, $password, '', $this->port);
+            if (!$this->link) {
+                $this->error = mysqli_connect_errno();
+            }
         } catch (\Throwable $e) {
             file_put_contents(
                 'mysql-import.log',
@@ -316,6 +345,10 @@ class MysqlImport
      */
     public function import()
     {
+        if ($this->file === false) {
+            return $this->message('blank database is ready.');
+        }
+
         mysqli_select_db($this->link, $this->database);
 
         $sql = '';

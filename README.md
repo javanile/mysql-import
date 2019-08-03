@@ -20,6 +20,10 @@ $ ./vendor/bin/mysql-import database.sql
 ## Testing
 
 ```bash
+$ docker-compose up -d mysql
+```
+
+```bash
 $ docker-compose run --rm composer install
 ```
 
