@@ -69,7 +69,7 @@ class MysqlImportTest extends TestCase
     public function testConnectionProblemWrongPassword()
     {
         $file = __DIR__.'/fixtures/database.sql';
-        $message = "Connection problem for user 'root' on host 'mysql' with error: ";
+        $message = "Connection problem for 'root' on 'mysql' with error: ";
 
         $app = new MysqlImport(['MYSQL_ROOT_PASSWORD' => 'wrong'], [$file]);
         $this->assertStringStartsWith($message, $app->run());
@@ -78,7 +78,7 @@ class MysqlImportTest extends TestCase
     public function testConnectionProblemWrongHost()
     {
         $file = __DIR__.'/fixtures/database.sql';
-        $message = "Connection problem for user 'root' on host 'wrong' with error: ";
+        $message = "Connection problem for 'root' on 'wrong' with error: ";
 
         $app = new MysqlImport(['MYSQL_HOST' => 'wrong', 'MYSQL_ROOT_PASSWORD' => 'wrong'], [$file]);
         $this->assertStringStartsWith($message, $app->run());

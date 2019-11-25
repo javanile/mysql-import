@@ -157,7 +157,7 @@ class MysqlImport
     public function run()
     {
         if ($this->doWhile) {
-            $time = time() + 15;
+            $time = time() + 300;
             do {
                 $this->connect('root', $this->rootPassword);
                 $this->waiting(5);
@@ -401,8 +401,11 @@ class MysqlImport
     {
         $this->exitCode = 2;
 
+        $message = mysqli_connect_error();
+        $errorNumber = mysqli_connect_errno();
+
         return $this->message(
-            "connection problem for user '{$user}' on host '{$this->host}' with error: ".mysqli_connect_error()
+            "connection problem for '{$user}' on '{$this->host}' with error: {$message} ({$errorNumber})."
         );
     }
 
