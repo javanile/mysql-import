@@ -70,12 +70,12 @@ class MysqlImport
     protected $exitCode;
 
     /**
-     * @var boolean
+     * @var bool
      */
     protected $doWhile;
 
     /**
-     * @var boolean
+     * @var bool
      */
     protected $error;
 
@@ -139,6 +139,7 @@ class MysqlImport
         //
         if (in_array('--no-file', $argv)) {
             $this->file = false;
+
             return;
         }
 
@@ -435,7 +436,9 @@ class MysqlImport
      * @param $done
      * @param $total
      * @param string $info
-     * @param int $width
+     * @param int    $width
+     * @param mixed  $second
+     *
      * @return string
      */
     public function waiting($second = 10)
@@ -444,7 +447,7 @@ class MysqlImport
         for ($i = 0; $i < $second * $freq; $i++) {
             echo $text = '['.substr($this->loader, 0, -1).'] waiting... ';
             usleep(1000000 / $freq);
-            $this->loader = substr($this->loader, -1) . substr($this->loader, 0, -1);
+            $this->loader = substr($this->loader, -1).substr($this->loader, 0, -1);
             echo str_repeat("\010", strlen($text));
         }
     }
