@@ -7,6 +7,8 @@
 
 The best way to import SQL file on your database.
 
+## UsageA
+
 ## Get started
 
 ```bash
@@ -16,6 +18,11 @@ $ composer require javanile/mysql-import
 ```bash
 $ ./vendor/bin/mysql-import database.sql
 ```
+
+## Usage
+This is how to use this
+This is how to use this
+
 
 ## Testing
 

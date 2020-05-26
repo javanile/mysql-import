@@ -77,6 +77,11 @@ class MysqlImport
     /**
      * @var boolean
      */
+    protected $force;
+
+    /**
+     * @var boolean
+     */
     protected $error;
 
     /**
@@ -95,6 +100,7 @@ class MysqlImport
         $this->exitCode = 0;
         $this->loader = '/\______';
         $this->doWhile = in_array('--do-while', $argv);
+        $this->force = in_array('--force', $argv);
 
         $defaultDatabase = isset($env['WORDPRESS_DB_PASSWORD']) ? 'wordpress' : 'database';
 
@@ -118,6 +124,7 @@ class MysqlImport
 
             // Get value from command-line argument
             if ($opt[2] && $arg = preg_grep('/^'.$opt[2].'[\S]*/', $argv)) {
+                var_dump($arg);
                 $value = substr(end($arg), strlen($opt[2]));
             }
 
@@ -152,7 +159,7 @@ class MysqlImport
     }
 
     /**
-     * Command entrypoint.
+     * Command entry-point.
      */
     public function run()
     {
@@ -207,7 +214,7 @@ class MysqlImport
         }
 
         //
-        if (!$this->blank()) {
+        if (!$this->blank() && !$this->force) {
             return $this->messageDatabaseNotBlank();
         }
 
@@ -238,7 +245,7 @@ class MysqlImport
 
         // try to import
         if ($this->exists()) {
-            if ($this->blank()) {
+            if ($this->blank() || $this->force) {
                 return $this->import();
             }
 
