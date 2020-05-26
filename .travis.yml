@@ -18,7 +18,7 @@ before_install:
   - sudo mysql -u root -e "CREATE DATABASE IF NOT EXISTS \`database\`;"
   - sudo mysql -u root -e "CREATE USER 'username'@'localhost' IDENTIFIED BY 'password';"
   - sudo mysql -u root -e "GRANT ALL ON *.* TO 'username'@'localhost'; FLUSH PRIVILEGES;"
-  - sudo mysql -u root -e "USE mysql; UPDATE user SET password=PASSWORD('root') WHERE user='root'; FLUSH PRIVILEGES;"
+  - sudo mysql -u root -e "USE mysql; UPDATE user SET password=PASSWORD('secret') WHERE user='root'; FLUSH PRIVILEGES;"
   - sudo service mysql restart
   - sudo apt-get update
 
