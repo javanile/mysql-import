@@ -80,9 +80,14 @@ class MysqlImport
     protected $force;
 
     /**
-     * @var boolean
+     * @var string
      */
     protected $error;
+
+    /**
+     * @var string
+     */
+    protected $unknownOption;
 
     /**
      * @var loader
@@ -99,8 +104,16 @@ class MysqlImport
     {
         $this->exitCode = 0;
         $this->loader = '/\______';
-        $this->doWhile = in_array('--do-while', $argv);
-        $this->force = in_array('--force', $argv);
+
+        if (in_array('--do-while', $argv)) {
+            $argv = array_diff($argv, ['--do-while']);
+            $this->doWhile = true;
+        }
+
+        if (in_array('--force', $argv)) {
+            $argv = array_diff($argv, ['--force']);
+            $this->force = true;
+        }
 
         $defaultDatabase = isset($env['WORDPRESS_DB_PASSWORD']) ? 'wordpress' : 'database';
 
@@ -124,8 +137,8 @@ class MysqlImport
 
             // Get value from command-line argument
             if ($opt[2] && $arg = preg_grep('/^'.$opt[2].'[\S]*/', $argv)) {
-                var_dump($arg);
                 $value = substr(end($arg), strlen($opt[2]));
+                $argv = array_diff($argv, $arg);
             }
 
             // Place value on property
@@ -143,20 +156,22 @@ class MysqlImport
             $this->port = $matches[1];
         }
 
-        //
+        // Get file to import or work without file
         if (in_array('--no-file', $argv)) {
             $this->file = false;
-
-            return;
-        }
-
-        // Look file to import
-        foreach ($argv as $arg) {
-            if ($arg[0] == '-') {
-                continue;
+            $argv = array_diff($argv, ['--no-file']);
+        } else {
+            foreach ($argv as $arg) {
+                if ($arg[0] != '-') {
+                    $this->file = $arg;
+                    $argv = array_diff($argv, [$arg]);
+                    break;
+                }
             }
-            $this->file = $arg;
         }
+
+        // Set first unprocessed argument as unknown option
+        $this->unknownOption = reset($argv);
     }
 
     /**
@@ -164,6 +179,10 @@ class MysqlImport
      */
     public function run()
     {
+        if ($this->unknownOption) {
+            return $this->messageUnknownOption();
+        }
+
         if ($this->doWhile) {
             $time = time() + 300;
             do {
@@ -407,13 +426,29 @@ class MysqlImport
      */
     protected function messageConnectionProblem($user)
     {
-        $this->exitCode = 2;
+        $this->exitCode = 1;
 
         $message = mysqli_connect_error();
         $errorNumber = mysqli_connect_errno();
 
         return $this->message(
             "connection problem for '{$user}' on '{$this->host}' with error: {$message} ({$errorNumber})."
+        );
+    }
+
+    /**
+     * Message for connection problem.
+     *
+     * @param $user
+     *
+     * @return string
+     */
+    protected function messageUnknownOption()
+    {
+        $this->exitCode = 2;
+
+        return $this->message(
+            "Unknown option '{$this->unknownOption}'."
         );
     }
 
@@ -452,10 +487,23 @@ class MysqlImport
     {
         $freq = 10;
         for ($i = 0; $i < $second * $freq; $i++) {
-            echo $text = '['.substr($this->loader, 0, -1).'] waiting... ';
+            $this->print($text = '['.substr($this->loader, 0, -1).'] waiting... ');
             usleep(1000000 / $freq);
             $this->loader = substr($this->loader, -1).substr($this->loader, 0, -1);
-            echo str_repeat("\010", strlen($text));
+            $this->print(str_repeat("\010", strlen($text)));
         }
+    }
+
+    /**
+     * @param $input
+     * @return mixed
+     */
+    public function print($input)
+    {
+        if (defined('PHPUNIT_MYSQL_IMPORT') && PHPUNIT_MYSQL_IMPORT) {
+            return;
+        }
+
+        echo $input;
     }
 }
