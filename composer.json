@@ -1,7 +1,7 @@
 {
   "name": "javanile/mysql-import",
   "description": "Import SQL file from command-line",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "license": "MIT",
   "type": "library",
   "authors": [
@@ -11,7 +11,7 @@
     }
   ],
   "bin": [
-    "mysql-import"
+    "bin/mysql-import"
   ],
   "autoload": {
     "psr-4": {

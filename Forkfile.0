@@ -1,3 +1,0 @@
-FROM https://github.com/javanile/php-package 1.x
-
-DUMP
