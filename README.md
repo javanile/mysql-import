@@ -38,5 +38,9 @@ $ docker-compose run --rm phpunit tests --filter ::testLoader
 ```
 
 ```bash
+$ docker-compose run --rm phpunit tests --stop-on-failure
+```
+
+```bash
 docker-compose run --rm php ./bin/mysql-import ./tests/fixtures/database.sql -psecret -utest --do-while
 ```
