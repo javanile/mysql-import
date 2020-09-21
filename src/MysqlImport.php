@@ -182,12 +182,12 @@ class MysqlImport extends DatabaseAdapter
             return false;
         }
 
-        //
+        // Create database if not exists
         if (!$this->exists()) {
             $this->create();
         }
 
-        //
+        // Exit if database in not empty
         if (!$this->blank() && !$this->force) {
             return $this->messageDatabaseNotBlank();
         }
@@ -253,6 +253,12 @@ class MysqlImport extends DatabaseAdapter
                     return $this->message(mysqli_error($this->link));
                 }
                 $sql = '';
+            }
+        }
+
+        if ($sql) {
+            if (!mysqli_query($this->link, $sql)) {
+                return $this->message(mysqli_error($this->link));
             }
         }
 
