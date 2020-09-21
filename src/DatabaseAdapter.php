@@ -77,7 +77,7 @@ class DatabaseAdapter
         }
 
         // Set rootPassword using password as default
-        if (is_null($this->rootPassword) && !is_null($this->password)) {
+        if ($this->rootPassword === null && $this->password !== null) {
             $this->rootPassword = $this->password;
         }
 
