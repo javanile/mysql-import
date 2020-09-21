@@ -330,7 +330,8 @@ class MysqlImport extends DatabaseAdapter
     protected function writeLockFile()
     {
         $json = [
-            'database' => $this->database
+            'database' => $this->database,
+            'force' => $this->force,
         ];
 
         file_put_contents($this->lockFile, json_encode($json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
