@@ -12,7 +12,7 @@
 
 namespace Javanile\MysqlImport;
 
-class MysqlImport
+class MysqlImport extends DatabaseAdapter
 {
     /**
      * @var string
@@ -20,49 +20,9 @@ class MysqlImport
     protected $file;
 
     /**
-     * @var
+     * @var string
      */
-    protected $link;
-
-    /**
-     * @var string|null
-     */
-    protected $host;
-
-    /**
-     * @var string|null
-     */
-    protected $port;
-
-    /**
-     * @var string|null
-     */
-    protected $database;
-
-    /**
-     * @var string|null
-     */
-    protected $user;
-
-    /**
-     * @var string|null
-     */
-    protected $password;
-
-    /**
-     * @var string|null
-     */
-    protected $rootPassword;
-
-    /**
-     * @var string|null
-     */
-    protected $exists;
-
-    /**
-     * @var string|null
-     */
-    protected $empty;
+    protected $lockFile;
 
     /**
      * @var int
@@ -82,15 +42,10 @@ class MysqlImport
     /**
      * @var string
      */
-    protected $error;
-
-    /**
-     * @var string
-     */
     protected $unknownOption;
 
     /**
-     * @var loader
+     * @var Loader
      */
     protected $loader;
 
@@ -103,7 +58,7 @@ class MysqlImport
     public function __construct($env, $argv)
     {
         $this->exitCode = 0;
-        $this->loader = '/\______';
+        $this->loader = new Loader();
 
         if (in_array('--do-while', $argv)) {
             $argv = array_diff($argv, ['--do-while']);
@@ -159,11 +114,13 @@ class MysqlImport
         // Get file to import or work without file
         if (in_array('--no-file', $argv)) {
             $this->file = false;
+            $this->lockFile = false;
             $argv = array_diff($argv, ['--no-file']);
         } else {
             foreach ($argv as $arg) {
                 if ($arg[0] != '-') {
-                    $this->file = $arg;
+                    $this->file = trim($arg);
+                    $this->lockFile = $this->file.'.lock';
                     $argv = array_diff($argv, [$arg]);
                     break;
                 }
@@ -187,7 +144,7 @@ class MysqlImport
             $time = time() + 300;
             do {
                 $this->connect('root', $this->rootPassword);
-                $this->waiting(5);
+                $this->loader->waiting(5);
             } while ($time > time() && $this->error && $this->error >= 2000);
         }
 
@@ -197,6 +154,10 @@ class MysqlImport
 
         if (!file_exists($this->file) && $this->file !== false) {
             return $this->message("sql file '{$this->file}' not found.");
+        }
+
+        if (file_exists($this->lockFile)) {
+            unlink($this->lockFile);
         }
 
         if ($message = $this->tryUserAndPassword()) {
@@ -220,7 +181,7 @@ class MysqlImport
 
         // first attempt avoid database delay
         if (!$this->connect($this->user, $this->password)) {
-            $this->waiting(10);
+            $this->loader->waiting(10);
         }
 
         // second attempt real check
@@ -255,7 +216,7 @@ class MysqlImport
 
         // first attempt avoid database delay
         if (!$this->connect('root', $this->rootPassword)) {
-            $this->waiting(10);
+            $this->loader->waiting(10);
         }
 
         // second attempt real check
@@ -275,96 +236,6 @@ class MysqlImport
         }
 
         return $this->message(mysqli_error($this->link));
-    }
-
-    /**
-     * Connect to database.
-     *
-     * @param $user
-     * @param $password
-     *
-     * @return mysqli
-     */
-    protected function connect($user, $password)
-    {
-        try {
-            $this->error = null;
-            $this->link = @mysqli_connect($this->host, $user, $password, '', $this->port);
-            if (!$this->link) {
-                $this->error = mysqli_connect_errno();
-            }
-        } catch (\Throwable $e) {
-            file_put_contents(
-                'mysql-import.log',
-                '['.date('Y-m-d H:i:s').'] ERROR - Message: '.$e->getMessage()."\n".$e->getTraceAsString()."\n",
-                FILE_APPEND
-            );
-        }
-
-        return $this->link;
-    }
-
-    /**
-     * Check if database exists.
-     *
-     * @return array|null
-     */
-    protected function exists()
-    {
-        $this->exists = @mysqli_fetch_assoc(@mysqli_query($this->link, "SHOW DATABASES LIKE '{$this->database}'"));
-
-        return $this->exists;
-    }
-
-    /**
-     * Check if database is blank.
-     *
-     * @return bool
-     */
-    protected function blank()
-    {
-        mysqli_select_db($this->link, $this->database);
-
-        $tables = @mysqli_fetch_all(@mysqli_query($this->link, 'SHOW TABLES'));
-
-        $this->empty = count($tables) == 0;
-
-        return $this->empty;
-    }
-
-    /**
-     * Create new database.
-     *
-     * @param null|mixed $agree
-     *
-     * @return bool|mysqli_result
-     */
-    public function drop($agree = null)
-    {
-        if ($agree != 'yes') {
-            return;
-        }
-
-        $sql = "DROP DATABASE `{$this->database}`";
-
-        $drop = mysqli_query($this->link, $sql);
-
-        return $drop;
-    }
-
-    /**
-     * Create new database.
-     *
-     * @return bool|mysqli_result
-     */
-    protected function create()
-    {
-        $create = mysqli_query(
-            $this->link,
-            "CREATE DATABASE `{$this->database}` CHARACTER SET utf8 COLLATE utf8_general_ci"
-        );
-
-        return $create;
     }
 
     /**
@@ -460,50 +331,5 @@ class MysqlImport
     public function getExitCode()
     {
         return $this->exitCode;
-    }
-
-    /**
-     * Get information.
-     */
-    public function getInfo()
-    {
-        return [
-            'host'     => $this->host,
-            'port'     => $this->port,
-            'database' => $this->database,
-        ];
-    }
-
-    /**
-     * @param $done
-     * @param $total
-     * @param string $info
-     * @param int    $width
-     * @param mixed  $second
-     *
-     * @return string
-     */
-    public function waiting($second = 10)
-    {
-        $freq = 10;
-        for ($i = 0; $i < $second * $freq; $i++) {
-            $this->print($text = '['.substr($this->loader, 0, -1).'] waiting... ');
-            usleep(1000000 / $freq);
-            $this->loader = substr($this->loader, -1).substr($this->loader, 0, -1);
-            $this->print(str_repeat("\010", strlen($text)));
-        }
-    }
-
-    /**
-     * @param $input
-     * @return mixed
-     */
-    public function print($input)
-    {
-        if (defined('PHPUNIT_MYSQL_IMPORT') && PHPUNIT_MYSQL_IMPORT) {
-            return;
-        }
-
-        echo $input;
     }
 }
