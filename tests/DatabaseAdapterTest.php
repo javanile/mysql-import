@@ -10,9 +10,9 @@ class DatabaseAdapterTest extends TestCase
     public function testDatabaseAdapter()
     {
         $properties = [
-            'host' => 'localhost',
-            'port' => '1080',
-            'database' => 'db_0'
+            'host'     => 'localhost',
+            'port'     => '1080',
+            'database' => 'db_0',
         ];
 
         $databaseAdapter = new DatabaseAdapter($properties);
