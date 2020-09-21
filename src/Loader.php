@@ -28,18 +28,21 @@ class Loader
     }
 
     /**
-     * @param mixed  $second
+     * @param mixed $second
+     * @param string $message
      *
      * @return string
      */
-    public function waiting($second = 10)
+    public function waiting($second = 10, $message = 'Waiting...')
     {
-        $freq = 10;
+        $freq = 5;
         for ($i = 0; $i < $second * $freq; $i++) {
-            $this->print($text = '['.substr($this->loader, 0, -1).'] waiting... ');
+            $text = '['.substr($this->loader, 0, -1).'] ' . $message;
+            $this->print($text);
             usleep(1000000 / $freq);
-            $this->loader = substr($this->loader, -1).substr($this->loader, 0, -1);
-            $this->print(str_repeat("\010", strlen($text)));
+            $this->loader = substr($this->loader, -1) . substr($this->loader, 0, -1);
+            $cleaner = str_repeat("\010", strlen($text));
+            $this->print($cleaner . str_repeat(' ', strlen($text)) . $cleaner);
         }
     }
 

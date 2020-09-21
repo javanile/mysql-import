@@ -11,8 +11,8 @@ class DatabaseAdapterTest extends TestCase
     {
         $properties = [
             'host' => 'localhost',
-            'username' => 'root',
-            'password' => 'secret'
+            'port' => '1080',
+            'database' => 'db_0'
         ];
 
         $databaseAdapter = new DatabaseAdapter($properties);

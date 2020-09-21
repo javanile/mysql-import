@@ -7,8 +7,6 @@
 
 The best way to import SQL file on your database.
 
-## UsageA
-
 ## Get started
 
 ```bash
@@ -18,11 +16,6 @@ $ composer require javanile/mysql-import
 ```bash
 $ ./vendor/bin/mysql-import database.sql
 ```
-
-## Usage
-This is how to use this
-This is how to use this
-
 
 ## Testing
 
@@ -38,6 +31,12 @@ $ docker-compose run --rm composer install
 $ docker-compose run --rm phpunit tests
 ```
 
+## TDD
+
 ```bash
 $ docker-compose run --rm phpunit tests --filter ::testLoader
+```
+
+```bash
+docker-compose run --rm php ./bin/mysql-import ./tests/fixtures/database.sql -psecret -utest --do-while
 ```

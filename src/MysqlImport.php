@@ -137,7 +137,7 @@ class MysqlImport extends DatabaseAdapter
             $time = time() + 300;
             do {
                 $this->connect('root', $this->rootPassword);
-                $this->loader->waiting(5);
+                $this->loader->waiting(5, 'Waiting for database server...');
             } while ($time > time() && $this->error && $this->error >= 2000);
         }
 
@@ -174,7 +174,7 @@ class MysqlImport extends DatabaseAdapter
 
         // first attempt avoid database delay
         if (!$this->connect($this->user, $this->password)) {
-            $this->loader->waiting(10);
+            $this->loader->waiting(10, 'Connecting to database with provided user...');
         }
 
         // second attempt real check
@@ -209,7 +209,7 @@ class MysqlImport extends DatabaseAdapter
 
         // first attempt avoid database delay
         if (!$this->connect('root', $this->rootPassword)) {
-            $this->loader->waiting(10);
+            $this->loader->waiting(10, 'Connecting to database as root user...');
         }
 
         // second attempt real check
