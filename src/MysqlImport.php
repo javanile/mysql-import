@@ -81,6 +81,7 @@ class MysqlImport extends DatabaseAdapter
             ['rootPassword', null, null, 'MYSQL_ROOT_PASSWORD', 'DB_ROOT_PASSWORD'],
         ];
 
+        $properties = [];
         foreach ($opts as $opt) {
             // Get default value
             $value = $opt[1];
@@ -97,19 +98,11 @@ class MysqlImport extends DatabaseAdapter
             }
 
             // Place value on property
-            $this->{$opt[0]} = $value;
+            $properties[$opt[0]] = $value;
         }
 
-        // Set rootPassword using password as default
-        if (is_null($this->rootPassword) && !is_null($this->password)) {
-            $this->rootPassword = $this->password;
-        }
-
-        // Set fix host port
-        if (preg_match('/:([0-9]+)$/', $this->host, $matches)) {
-            $this->host = substr($this->host, 0, -1 - strlen($matches[1]));
-            $this->port = $matches[1];
-        }
+        // Initialize base class
+        parent::__construct($properties);
 
         // Get file to import or work without file
         if (in_array('--no-file', $argv)) {

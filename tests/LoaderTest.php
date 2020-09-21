@@ -3,7 +3,6 @@
 namespace Javanile\MysqlImport\Tests;
 
 use Javanile\MysqlImport\Loader;
-use Javanile\MysqlImport\MysqlImport;
 use PHPUnit\Framework\TestCase;
 
 class LoaderTest extends TestCase

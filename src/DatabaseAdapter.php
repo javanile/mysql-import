@@ -65,6 +65,30 @@ class DatabaseAdapter
     protected $connectError;
 
     /**
+     * DatabaseAdapter constructor.
+     *
+     * @param $properties
+     */
+    public function __construct($properties)
+    {
+        // Fill all properties
+        foreach ($properties as $property => $value) {
+            $this->{$property} = $value;
+        }
+
+        // Set rootPassword using password as default
+        if (is_null($this->rootPassword) && !is_null($this->password)) {
+            $this->rootPassword = $this->password;
+        }
+
+        // Set fix host port
+        if (preg_match('/:([0-9]+)$/', $this->host, $matches)) {
+            $this->host = substr($this->host, 0, -1 - strlen($matches[1]));
+            $this->port = $matches[1];
+        }
+    }
+
+    /**
      * Connect to database.
      *
      * @param $user

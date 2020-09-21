@@ -2,14 +2,21 @@
 
 namespace Javanile\MysqlImport\Tests;
 
-use Javanile\MysqlImport\MysqlImport;
+use Javanile\MysqlImport\DatabaseAdapter;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseAdapterTest extends TestCase
 {
     public function testDatabaseAdapter()
     {
+        $properties = [
+            'host' => 'localhost',
+            'username' => 'root',
+            'password' => 'secret'
+        ];
 
-        $this->assertEquals(2, $mysqlImport->getExitCode());
+        $databaseAdapter = new DatabaseAdapter($properties);
+
+        $this->assertEquals($databaseAdapter->getInfo(), $properties);
     }
 }
