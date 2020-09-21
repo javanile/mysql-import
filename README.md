@@ -37,3 +37,7 @@ $ docker-compose run --rm composer install
 ```bash
 $ docker-compose run --rm phpunit tests
 ```
+
+```bash
+$ docker-compose run --rm phpunit tests --filter ::testLoader
+```
