@@ -262,6 +262,8 @@ class MysqlImport extends DatabaseAdapter
             }
         }
 
+        $this->writeLockFile();
+
         return $this->message("database named '{$this->database}' successfully imported.");
     }
 
@@ -320,6 +322,18 @@ class MysqlImport extends DatabaseAdapter
         return $this->message(
             "Unknown option '{$this->unknownOption}'."
         );
+    }
+
+    /**
+     *
+     */
+    protected function writeLockFile()
+    {
+        $json = [
+            'database' => $this->database
+        ];
+
+        file_put_contents($this->lockFile, json_encode($json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
     }
 
     /**

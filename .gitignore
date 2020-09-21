@@ -1,5 +1,6 @@
 .idea/
 build/
 vendor/
+tests/fixtures/*.lock
 composer.lock
 *.log
