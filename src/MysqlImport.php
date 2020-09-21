@@ -331,7 +331,7 @@ class MysqlImport extends DatabaseAdapter
     {
         $json = [
             'database' => $this->database,
-            'force' => $this->force,
+            'force'    => $this->force,
         ];
 
         file_put_contents($this->lockFile, json_encode($json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));

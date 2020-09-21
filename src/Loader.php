@@ -28,7 +28,7 @@ class Loader
     }
 
     /**
-     * @param mixed $second
+     * @param mixed  $second
      * @param string $message
      *
      * @return string
@@ -37,12 +37,12 @@ class Loader
     {
         $freq = 5;
         for ($i = 0; $i < $second * $freq; $i++) {
-            $text = '['.substr($this->loader, 0, -1).'] ' . $message;
+            $text = '['.substr($this->loader, 0, -1).'] '.$message;
             $this->print($text);
             usleep(1000000 / $freq);
-            $this->loader = substr($this->loader, -1) . substr($this->loader, 0, -1);
+            $this->loader = substr($this->loader, -1).substr($this->loader, 0, -1);
             $cleaner = str_repeat("\010", strlen($text));
-            $this->print($cleaner . str_repeat(' ', strlen($text)) . $cleaner);
+            $this->print($cleaner.str_repeat(' ', strlen($text)).$cleaner);
         }
     }
 
